@@ -1,43 +1,98 @@
 import React from 'react';
 import {
   AppRegistry,
+  asset,
+  Environment,
+  NativeModules,
   StyleSheet,
   Text,
   View,
 } from 'react-360';
+import InfoButton from './components/InfoButton';
+import Video from './components/Video';
+import Audio from './components/Audio';
+import Video360 from './components/Video360';
 
-export default class NarimanReact360 extends React.Component {
+const SCENES = ['Video', 'Audio', '360'];
+
+class Scene extends React.Component {
+  state = {
+    scene: ''
+  }
+
+  componentDidMount() {
+    Environment.setBackgroundImage(asset('arena.png'), { rotateTransform: [{rotateY: '180deg'}] });
+  }
+
+  clearMedia() {
+    Environment.clearBackground();
+  }
+
+  clickHandler(selection) {
+    this.setState({
+      scene: selection
+    })
+
+    this.clearMedia();
+  }
+
   render() {
-    return (
+    const scene = this.state.scene;
+    let selection;
+    const sceneButtons = [];
+
+    if (scene === 'Video') {
+      selection = <Video />;
+    } else if (scene === 'Audio') {
+      selection = <Audio />;
+    } else if (scene === '360') {
+      selection = <Video360 />;
+    }
+
+    for (let i in SCENES) {
+      sceneButtons.push(
+        <InfoButton
+          key={i}
+          style={styles.button}
+          source={asset('53283.svg')}
+          text={SCENES[i]}
+          onClick={() => { this.clickHandler(SCENES[i])}}
+        />
+      )
+    }
+
+    return(
       <View style={styles.panel}>
-        <View style={styles.greetingBox}>
-          <Text style={styles.greeting}>
-            Welcome to React 360
-          </Text>
+        <View>
+          {selection}
+        </View>
+        <View style={styles.section}>
+          {sceneButtons}
         </View>
       </View>
-    );
+    )
   }
-};
+}
 
 const styles = StyleSheet.create({
   panel: {
-    // Fill the entire surface
-    width: 1000,
-    height: 600,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 800,
+    height: 450,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
   },
-  greetingBox: {
-    padding: 20,
-    backgroundColor: '#000000',
-    borderColor: '#639dda',
-    borderWidth: 2,
+  section: {
+    padding: 10,
+    backgroundColor: '#FFE500',
+    borderColor: '#ED8B00',
+    borderWidth: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
-  greeting: {
-    fontSize: 30,
-  },
+  button: {
+    marginLeft: 5,
+    marginRight: 5,
+  }
 });
 
-AppRegistry.registerComponent('NarimanReact360', () => NarimanReact360);
+AppRegistry.registerComponent('Scene', () => Scene);
